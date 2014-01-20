@@ -2,11 +2,9 @@ Puppet::Type.newtype(:plist) do
   desc "A puppet type for manipulating plist files using defaults"
   ensurable
 
-  newparam(:name, :namevar => true) do
-    desc "Namevar for the type"
-  end
-
   newparam(:domain) do
+    isnamevar
+    # :namevar => true
     desc "The domain of the plist"
     validate do |value|
       fail("Domain must not end in .plist") if 
@@ -26,5 +24,15 @@ Puppet::Type.newtype(:plist) do
 
   newproperty(:value, :array_matching => :all) do
     desc "The value of the key being written"
+    munge do |value|
+      case value
+      when 'true', 'True', 'TRUE'
+        'TRUE' 
+      when 'false', 'False', 'FALSE'
+        'FALSE'
+      else
+        value
+      end
+    end
   end
 end 
